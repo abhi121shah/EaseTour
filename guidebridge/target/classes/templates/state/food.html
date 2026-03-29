@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title th:text="'Famous Food in ' + ${state.name} + ' | Easetour'">Famous Food | Easetour</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "inverse-surface": "#2e3132", "on-primary-container": "#a8c0ff",
+            "on-secondary-fixed-variant": "#793000", "on-tertiary-container": "#95c5ff",
+            "on-secondary-fixed": "#341100", "surface-container-low": "#f3f4f5",
+            "outline-variant": "#c3c6d4", "secondary-fixed": "#ffdbcb",
+            "on-secondary-container": "#5d2300", "surface-container": "#edeeef",
+            "on-primary-fixed": "#001945", "inverse-on-surface": "#f0f1f2",
+            "tertiary": "#003b66", "surface-bright": "#f8f9fa", "background": "#f8f9fa",
+            "on-primary-fixed-variant": "#094298", "on-tertiary": "#ffffff",
+            "on-background": "#191c1d", "surface-container-lowest": "#ffffff",
+            "on-surface-variant": "#434652", "on-error": "#ffffff",
+            "primary-fixed-dim": "#b0c6ff", "error-container": "#ffdad6",
+            "on-surface": "#191c1d", "on-primary": "#ffffff",
+            "on-secondary": "#ffffff", "outline": "#737783",
+            "secondary": "#9f4200", "surface-dim": "#d9dadb",
+            "surface-container-highest": "#e1e3e4",
+            "on-error-container": "#93000a", "primary": "#00347f",
+            "secondary-container": "#fc7727", "primary-container": "#1a4ba1",
+            "surface-tint": "#2f5bb1", "inverse-primary": "#b0c6ff",
+            "surface-container-high": "#e7e8e9", "surface": "#f8f9fa",
+            "error": "#ba1a1a", "surface-variant": "#e1e3e4",
+            "secondary-fixed-dim": "#ffb692", "primary-fixed": "#d9e2ff",
+            "secondary-fixed": "#ffdbcb"
+          },
+          fontFamily: { "headline": ["Plus Jakarta Sans"], "body": ["Be Vietnam Pro"], "label": ["Be Vietnam Pro"] },
+          borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .hero-gradient { background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%); }
+    .ambient-shadow { box-shadow: 0 20px 40px -10px rgba(0, 52, 127, 0.06); }
+  </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+
+<!-- Nav -->
+<nav class="bg-surface-container-lowest sticky top-0 z-50 shadow-sm">
+  <div class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+    <div class="text-2xl font-bold text-primary" th:text="${state.navTitle}">STATE Tourism</div>
+    <div class="hidden md:flex items-center space-x-8">
+      <a class="text-on-surface hover:text-secondary font-medium transition-colors"
+         th:href="@{/state/{id}/places(id=${state.id})}">Destinations</a>
+      <a class="text-primary font-bold border-b-2 border-primary pb-1">Cuisines</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="relative h-[500px] w-full overflow-hidden">
+  <div class="absolute inset-0">
+    <img class="w-full h-full object-cover"
+         th:src="${state.heroImage}"
+         th:alt="${state.name} + ' food and cuisine'"/>
+    <div class="absolute inset-0 hero-gradient"></div>
+  </div>
+  <div class="relative h-full max-w-7xl mx-auto px-8 flex flex-col justify-end pb-24">
+    <h1 class="font-headline text-6xl md:text-8xl font-extrabold text-white tracking-tight leading-none mb-4">
+      The Flavors <br/>
+      <span class="text-secondary-container" th:text="'of ' + ${state.name}">of State</span>
+    </h1>
+    <p class="text-white/80 max-w-xl text-lg font-light leading-relaxed"
+       th:text="'Embark on a sensory journey through the authentic flavors and centuries-old culinary traditions of ' + ${state.name} + '.'">
+      Description
+    </p>
+  </div>
+</header>
+
+<!-- Main: Dishes -->
+<main class="max-w-7xl mx-auto px-8 py-24">
+  <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+    <div>
+      <h2 class="font-headline text-4xl md:text-5xl font-bold text-primary mb-4 italic"
+          th:text="'Signature Dishes of ' + ${state.name}">Signature Dishes</h2>
+      <div class="w-24 h-1.5 bg-secondary rounded-full"></div>
+    </div>
+    <p class="text-on-surface-variant max-w-md"
+       th:text="'The essential list of ' + ${state.name} + ' culinary icons, cherished across generations.'">Description</p>
+  </div>
+
+  <!-- Food Card Grid — loops over state.famousFood list from Java -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+    <div th:each="dish, iter : ${state.famousFood}"
+         class="group bg-surface-container-lowest rounded-xl overflow-hidden ambient-shadow flex flex-col transition-transform duration-300 hover:-translate-y-2">
+      <!-- Food icon placeholder -->
+      <div class="h-48 overflow-hidden relative bg-gradient-to-br from-secondary-container/20 to-primary/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-6xl text-secondary" style="font-variation-settings:'FILL' 1;">restaurant</span>
+        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+          <span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="text-xs font-bold text-on-surface"
+                th:text="${4 + (iter.index % 2) * 0.5 + (iter.index % 3) * 0.1} + '/5.0'">4.8/5.0</span>
+        </div>
+      </div>
+      <div class="p-8 flex-grow flex flex-col">
+        <h3 class="font-headline text-2xl font-bold text-primary mb-3" th:text="${dish}">Dish Name</h3>
+        <p class="text-on-surface-variant text-sm leading-relaxed mb-6 flex-grow">
+          A beloved culinary tradition of <span th:text="${state.name}">State</span>, enjoyed by locals and tourists alike for its distinctive flavors and cultural significance.
+        </p>
+        <span class="inline-flex items-center gap-1 text-secondary text-xs font-bold uppercase tracking-wider">
+          <span class="material-symbols-outlined text-sm">location_on</span>
+          <span th:text="'Traditional ' + ${state.name} + ' Cuisine'">State Cuisine</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-slate-200">
+  <div class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto">
+    <div class="mb-8 md:mb-0">
+      <div class="text-lg font-black text-primary uppercase tracking-widest mb-2">Easetour</div>
+      <p class="text-xs uppercase tracking-widest text-on-surface-variant">© 2026 Easetour. The Curated Wanderer.</p>
+    </div>
+    <div class="flex gap-8 items-center">
+      <a th:href="@{/state/{id}(id=${state.id})}"
+         class="flex items-center gap-2 text-primary font-bold hover:underline">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Back to <span th:text="${state.name}">State</span>
+      </a>
+      <a th:href="@{/state/{id}/places(id=${state.id})}"
+         class="flex items-center gap-2 text-secondary font-bold hover:underline">
+        View Places
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

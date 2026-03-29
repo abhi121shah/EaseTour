@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Easetour | Stats & Popularity</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          "primary": "#00347f", "primary-container": "#1a4ba1",
+          "secondary": "#9f4200", "secondary-container": "#fc7727",
+          "surface": "#f8f9fa", "surface-container": "#edeeef",
+          "surface-container-lowest": "#ffffff", "on-surface": "#191c1d",
+          "on-surface-variant": "#434652",
+        },
+        fontFamily: { "headline": ["Plus Jakarta Sans"], "body": ["Be Vietnam Pro"] },
+        borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "full": "9999px"},
+      }},
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .bar-fill { transition: width 1s ease-out; }
+  </style>
+</head>
+<body class="bg-surface font-body text-on-surface min-h-screen">
+
+<!-- Nav -->
+<nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-slate-100">
+  <div class="flex justify-between items-center w-full px-8 py-4 max-w-6xl mx-auto">
+    <a th:href="@{/select}" class="font-headline font-extrabold text-2xl text-primary hover:opacity-80 transition-opacity">Easetour</a>
+    <div class="flex items-center gap-4">
+      <span th:if="${displayName}" class="hidden md:block text-sm text-slate-500" th:text="'Hi, ' + ${displayName}"></span>
+      <a th:href="@{/search}" class="text-sm text-slate-500 hover:text-primary font-medium transition-colors">Search</a>
+      <a th:href="@{/logout}" class="text-sm text-slate-500 hover:text-red-600 font-medium transition-colors">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<main class="max-w-6xl mx-auto px-8 py-16">
+
+  <!-- Header -->
+  <header class="mb-16">
+    <span class="text-secondary font-bold uppercase tracking-widest text-xs mb-3 block">Live Analytics</span>
+    <h1 class="font-headline text-5xl font-extrabold text-primary mb-4">State Popularity Stats</h1>
+    <p class="text-on-surface-variant max-w-xl">
+      Powered by <code class="bg-primary/10 text-primary px-2 py-0.5 rounded text-sm">VisitCounterService</code>
+      — Java <code class="bg-primary/10 text-primary px-2 py-0.5 rounded text-sm">ConcurrentHashMap&lt;String, AtomicInteger&gt;</code>
+      tracks page visits in real time.
+    </p>
+  </header>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-16">
+    <div class="bg-surface-container-lowest rounded-xl p-6 shadow-md text-center">
+      <span class="material-symbols-outlined text-3xl text-secondary mb-2" style="font-variation-settings:'FILL' 1;">visibility</span>
+      <p class="text-4xl font-extrabold text-primary" th:text="${totalVisits}">0</p>
+      <p class="text-sm text-on-surface-variant mt-1">Total Page Visits</p>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl p-6 shadow-md text-center">
+      <span class="material-symbols-outlined text-3xl text-primary mb-2" style="font-variation-settings:'FILL' 1;">group</span>
+      <p class="text-4xl font-extrabold text-primary" th:text="${userCount}">0</p>
+      <p class="text-sm text-on-surface-variant mt-1">Registered Users</p>
+    </div>
+    <div class="col-span-2 md:col-span-1 bg-primary rounded-xl p-6 shadow-md text-center text-white">
+      <span class="material-symbols-outlined text-3xl mb-2" style="font-variation-settings:'FILL' 1;">timeline</span>
+      <p class="text-4xl font-extrabold" th:text="${#lists.size(topStates)}">0</p>
+      <p class="text-sm opacity-80 mt-1">States Tracked</p>
+    </div>
+  </div>
+
+  <!-- Top States Leaderboard — data from VisitCounterService.getTopStates(6) -->
+  <section class="mb-16">
+    <h2 class="font-headline text-3xl font-bold text-primary mb-8">🏆 Visit Leaderboard</h2>
+    <div class="space-y-4">
+      <!-- topStates is List<Object[]> where [0]=State, [1]=Integer visitCount -->
+      <div th:each="entry, iter : ${topStates}"
+           class="bg-surface-container-lowest rounded-xl p-6 shadow-sm flex items-center gap-6 hover:shadow-md transition-shadow">
+
+        <!-- Rank Badge -->
+        <div class="w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-lg shrink-0"
+             th:classappend="${iter.index == 0} ? 'bg-yellow-400 text-yellow-900' : (${iter.index == 1} ? 'bg-slate-300 text-slate-800' : (${iter.index == 2} ? 'bg-orange-300 text-orange-900' : 'bg-surface-container text-on-surface-variant'))"
+             th:text="${iter.count}">1</div>
+
+        <!-- State Info -->
+        <div class="flex-grow">
+          <div class="flex justify-between items-center mb-2">
+            <!-- entry[0] is the State object from Java -->
+            <a th:href="@{/state/{id}(id=${entry[0].id})}"
+               class="font-headline font-bold text-xl text-primary hover:underline"
+               th:text="${entry[0].name}">State Name</a>
+            <!-- entry[1] is the Integer visit count from AtomicInteger.get() -->
+            <span class="font-bold text-on-surface-variant" th:text="${entry[1]} + ' visit' + (${entry[1] != 1} ? 's' : '')">0 visits</span>
+          </div>
+          <!-- Progress bar — width proportional to visit count vs. #1 state -->
+          <div class="h-2.5 bg-surface-container rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-primary to-secondary-container rounded-full bar-fill"
+                 th:style="'width:' + (${totalVisits > 0} ? ${#numbers.formatDecimal(entry[1] * 100.0 / totalVisits, 0, 0)} : '0') + '%'"></div>
+          </div>
+        </div>
+
+        <!-- Image -->
+        <img class="w-16 h-16 rounded-lg object-cover shrink-0 hidden md:block"
+             th:src="${entry[0].heroImage}"
+             th:alt="${entry[0].name}"/>
+      </div>
+
+      <!-- Zero state -->
+      <div th:if="${#lists.isEmpty(topStates)}" class="text-center py-16 text-slate-400">
+        <span class="material-symbols-outlined text-5xl">bar_chart</span>
+        <p class="mt-4 text-lg">No visits recorded yet. Start exploring state pages!</p>
+        <a th:href="@{/select}" class="mt-4 inline-block text-primary font-bold hover:underline">Go Explore →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- All State Counts Table -->
+  <section th:if="${!#maps.isEmpty(allCounts)}">
+    <h2 class="font-headline text-3xl font-bold text-primary mb-6">All States</h2>
+    <div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-surface-container text-on-surface-variant font-semibold">
+          <tr>
+            <th class="px-6 py-4 text-left">State</th>
+            <th class="px-6 py-4 text-right">Visits</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="entry : ${allCounts}"
+              class="border-t border-slate-100 hover:bg-surface-container/50 transition-colors">
+            <td class="px-6 py-4 font-medium" th:text="${entry.key}">State Name</td>
+            <td class="px-6 py-4 text-right font-bold text-primary" th:text="${entry.value}">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="bg-slate-50 border-t border-slate-200 mt-20">
+  <div class="max-w-6xl mx-auto px-8 py-8 flex justify-between items-center text-sm text-slate-400">
+    <span class="font-bold text-primary">Easetour</span>
+    <span>© 2026 Easetour. The Curated Wanderer.</span>
+  </div>
+</footer>
+
+</body>
+</html>

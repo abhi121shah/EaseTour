@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title th:text="'Search: ' + ${query} + ' | Easetour'">Search | Easetour</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          "primary": "#00347f", "primary-container": "#1a4ba1",
+          "secondary": "#9f4200", "secondary-container": "#fc7727",
+          "surface": "#f8f9fa", "surface-container": "#edeeef",
+          "surface-container-lowest": "#ffffff", "on-surface": "#191c1d",
+          "on-surface-variant": "#434652", "outline-variant": "#c3c6d4"
+        },
+        fontFamily: { "headline": ["Plus Jakarta Sans"], "body": ["Be Vietnam Pro"] },
+        borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "full": "9999px"},
+      }},
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  </style>
+</head>
+<body class="bg-surface font-body text-on-surface min-h-screen">
+
+<!-- Nav -->
+<nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-slate-100">
+  <div class="flex justify-between items-center w-full px-8 py-4 max-w-6xl mx-auto">
+    <a th:href="@{/select}" class="font-headline font-extrabold text-2xl text-primary hover:opacity-80 transition-opacity">Easetour</a>
+    <div class="flex items-center gap-4">
+      <span th:if="${displayName}" class="hidden md:block text-sm text-slate-500" th:text="'Hi, ' + ${displayName}"></span>
+      <a th:href="@{/stats}" class="text-sm text-slate-500 hover:text-primary font-medium transition-colors">Stats</a>
+      <a th:href="@{/logout}" class="text-sm text-slate-500 hover:text-red-600 font-medium transition-colors">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<main class="max-w-6xl mx-auto px-8 py-16">
+
+  <!-- Search Header -->
+  <header class="mb-12">
+    <h1 class="font-headline text-5xl font-extrabold text-primary mb-3">Search Results</h1>
+    <!-- SearchService.search() result count passed from Java controller -->
+    <p class="text-on-surface-variant text-lg">
+      Found <strong th:text="${resultCount}">0</strong> result(s) for
+      <em class="text-secondary font-semibold" th:text="'&quot;' + ${query} + '&quot;'">"query"</em>
+    </p>
+  </header>
+
+  <!-- Search Box -->
+  <form th:action="@{/search}" method="get" class="mb-12">
+    <div class="flex gap-3 max-w-xl">
+      <div class="relative flex-grow">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400">search</span>
+        <input type="text" name="q" id="search-input"
+               th:value="${query}"
+               placeholder="Search states, places, food..."
+               class="w-full h-14 pl-12 pr-4 rounded-xl bg-white border border-outline-variant focus:ring-2 focus:ring-primary/20 focus:outline-none shadow-sm"/>
+      </div>
+      <button type="submit"
+              class="h-14 px-8 bg-primary text-white rounded-xl font-bold hover:bg-primary-container transition-colors shadow-sm">
+        Search
+      </button>
+    </div>
+  </form>
+
+  <!-- Results — rendered from SearchService.search() via Java Stream filter -->
+  <section th:if="${resultCount > 0}">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <a th:each="state : ${results}"
+         th:href="@{/state/{id}(id=${state.id})}"
+         class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+        <div class="h-48 overflow-hidden relative">
+          <img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+               th:src="${state.heroImage}"
+               th:alt="${state.name}"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent"></div>
+          <div class="absolute bottom-4 left-4 text-white">
+            <span class="text-xs font-bold uppercase tracking-widest text-secondary-container">India</span>
+            <h2 class="text-2xl font-headline font-extrabold" th:text="${state.name}">State</h2>
+          </div>
+        </div>
+        <div class="p-6 flex flex-col flex-grow">
+          <p class="text-on-surface-variant text-sm leading-relaxed mb-4 flex-grow"
+             th:text="${state.tagline}">Tagline</p>
+          <div class="flex items-center gap-2 text-xs text-slate-500">
+            <span class="material-symbols-outlined text-sm text-secondary">calendar_today</span>
+            <span th:text="${state.bestTime}">Best time</span>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <span class="text-primary font-bold text-sm">Explore →</span>
+            <span class="bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full"
+                  th:text="${state.famousPlaces.size()} + ' places'">N places</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- No Results -->
+  <section th:if="${resultCount == 0}" class="text-center py-24">
+    <span class="material-symbols-outlined text-6xl text-slate-300">search_off</span>
+    <h2 class="text-3xl font-bold text-slate-400 mt-6 mb-3">No results found</h2>
+    <p class="text-slate-400 mb-8">Try searching for a state name, landmark, or dish (e.g. "Goa", "Biryani", "Fort")</p>
+    <a th:href="@{/select}" class="inline-flex items-center gap-2 text-primary font-bold hover:underline">
+      <span class="material-symbols-outlined">arrow_back</span> Back to Explore
+    </a>
+  </section>
+</main>
+
+<footer class="bg-slate-50 border-t border-slate-200 mt-20">
+  <div class="max-w-6xl mx-auto px-8 py-8 flex justify-between items-center text-sm text-slate-400">
+    <span class="font-bold text-primary">Easetour</span>
+    <span>© 2026 Easetour. The Curated Wanderer.</span>
+  </div>
+</footer>
+</body>
+</html>
