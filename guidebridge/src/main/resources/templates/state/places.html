@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title th:text="'Famous Places in ' + ${state.name} + ' | Easetour'">Famous Places | Easetour</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-lowest": "#ffffff", "outline": "#737783", "on-primary": "#ffffff",
+            "on-surface": "#191c1d", "primary-container": "#1a4ba1", "secondary-container": "#fc7727",
+            "on-secondary": "#ffffff", "surface-variant": "#e1e3e4", "surface-container-highest": "#e1e3e4",
+            "on-surface-variant": "#434652", "on-primary-container": "#a8c0ff",
+            "primary-fixed": "#d9e2ff", "primary-fixed-dim": "#b0c6ff",
+            "on-secondary-container": "#5d2300", "background": "#f8f9fa", "surface": "#f8f9fa",
+            "surface-container": "#edeeef", "on-background": "#191c1d", "secondary": "#9f4200",
+            "inverse-primary": "#b0c6ff", "surface-container-low": "#f3f4f5",
+            "primary": "#00347f", "surface-container-high": "#e7e8e9", "error": "#ba1a1a"
+          },
+          fontFamily: { "headline": ["Plus Jakarta Sans"], "body": ["Be Vietnam Pro"], "label": ["Be Vietnam Pro"] },
+          borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+  <style>
+    .plusJakartaSans { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .beVietnamPro { font-family: 'Be Vietnam Pro', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-secondary/30">
+
+<!-- Top Nav -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-[0_40px_40px_rgba(0,52,127,0.06)]">
+  <div class="flex justify-between items-center px-8 py-4 max-w-screen-2xl mx-auto">
+    <div class="text-2xl font-bold text-[#00347f] plusJakartaSans" th:text="${state.navTitle}">STATE Tourism</div>
+    <div class="hidden md:flex items-center gap-8 plusJakartaSans text-sm font-medium tracking-tight">
+      <a class="text-[#00347f] font-bold border-b-2 border-[#9f4200] pb-1" href="#">Destinations</a>
+      <a class="text-slate-600 hover:text-[#00347f] transition-colors"
+         th:href="@{/state/{id}/food(id=${state.id})}">Cuisines</a>
+    </div>
+  </div>
+</nav>
+
+<main class="pt-20">
+  <!-- Hero Section -->
+  <section class="relative h-[500px] min-h-[400px] w-full overflow-hidden">
+    <img alt="State Hero" class="absolute inset-0 w-full h-full object-cover"
+         th:src="${state.heroImage}"
+         th:alt="${state.name} + ' landmark'"/>
+    <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent"></div>
+    <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+      <h1 class="text-white text-5xl md:text-7xl font-bold plusJakartaSans tracking-tight mb-4 drop-shadow-lg"
+          th:text="'The Landmarks of ' + ${state.name}">The Landmarks</h1>
+      <p class="text-white/90 text-lg md:text-xl max-w-2xl beVietnamPro font-light italic"
+         th:text="${state.tagline}">Tagline</p>
+    </div>
+  </section>
+
+  <!-- Places Grid — loops over state.famousPlaces from Java service -->
+  <section class="max-w-screen-2xl mx-auto px-8 py-20">
+    <div class="mb-12 text-center">
+      <h2 class="text-4xl font-bold text-primary plusJakartaSans mb-4"
+          th:text="'Famous Places in ' + ${state.name}">Famous Places</h2>
+      <p class="text-slate-500 beVietnamPro max-w-2xl mx-auto">Explore the most iconic destinations that make this state unforgettable.</p>
+      <div class="w-24 h-1.5 bg-secondary rounded-full mx-auto mt-4"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+      <!-- Thymeleaf loops over state.famousPlaces list from Java -->
+      <div th:each="place, iter : ${state.famousPlaces}"
+           class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_40px_40px_rgba(0,52,127,0.06)] hover:translate-y-[-8px] transition-all duration-300">
+        <div class="h-48 bg-gradient-to-br from-primary to-primary-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-white text-6xl">place</span>
+        </div>
+        <div class="p-8">
+          <div class="flex justify-between items-start mb-4">
+            <span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Landmark</span>
+            <div class="flex items-center text-secondary">
+              <span class="material-symbols-outlined scale-75" style="font-variation-settings:'FILL' 1;">star</span>
+              <span class="text-sm font-bold ml-1" th:text="'4.' + ${(iter.index % 5) + 4}">4.8</span>
+            </div>
+          </div>
+          <h3 class="text-2xl font-bold text-primary mb-2 plusJakartaSans" th:text="${place}">Place Name</h3>
+          <p class="text-on-surface-variant beVietnamPro text-sm leading-relaxed mb-6">
+            One of <span th:text="${state.name}">State</span>'s most celebrated destinations, offering a unique glimpse into the region's heritage and natural beauty.
+          </p>
+          <button class="w-full py-3 bg-primary text-on-primary rounded-full font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2 group">
+            Explore Destination
+            <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer class="w-full rounded-t-[3rem] mt-20 bg-[#f8f9fa]">
+  <div class="flex flex-col md:flex-row justify-between items-center px-12 py-10 w-full">
+    <div class="mb-8 md:mb-0">
+      <div class="text-lg font-bold text-[#00347f] plusJakartaSans mb-2">Easetour</div>
+      <p class="beVietnamPro text-xs font-normal opacity-80 max-w-xs text-slate-500">© 2026 Easetour. All rights reserved.</p>
+    </div>
+    <div class="flex gap-6">
+      <a th:href="@{/state/{id}(id=${state.id})}"
+         class="flex items-center gap-2 text-primary font-bold hover:underline">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Back to <span th:text="${state.name}">State</span>
+      </a>
+      <a th:href="@{/state/{id}/food(id=${state.id})}"
+         class="flex items-center gap-2 text-secondary font-bold hover:underline">
+        View Food
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

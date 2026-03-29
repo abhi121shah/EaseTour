@@ -1,0 +1,4 @@
+com\Easetour\service\StateService.class
+com\Easetour\controller\AppController.class
+com\Easetour\model\State.class
+com\Easetour\EasetourApplication.class
